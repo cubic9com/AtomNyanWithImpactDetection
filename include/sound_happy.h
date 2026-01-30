@@ -1,5 +1,5 @@
-#ifndef WAV_HAPPY_H
-#define WAV_HAPPY_H
+#ifndef SOUND_HAPPY_H
+#define SOUND_HAPPY_H
 
 #include <Arduino.h>
 
@@ -1038,4 +1038,4 @@ const unsigned char sound_happy[16161] PROGMEM = {
 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x7f, 0x7f, 
 0x7f, };
 
-#endif // WAV_HAPPY_H
+#endif // SOUND_HAPPY_H
