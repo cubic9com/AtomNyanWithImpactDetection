@@ -4,6 +4,9 @@
 #include <M5Unified.h>
 #include <Avatar.h>
 #include "fft.hpp"
+#include "sound_happy.h"
+#include "sound_angry.h"
+#include "impact_handler.h"
 #include <cinttypes>
 #if defined(ARDUINO_M5STACK_CORES3)
   #include <gob_unifiedButton.hpp>
@@ -42,7 +45,18 @@ uint8_t palette_index = 0;
 uint32_t last_rotation_msec = 0;
 uint32_t last_lipsync_max_msec = 0;
 
+// 衝撃検知用の変数（impact_handler.hで宣言、ここで定義）
+uint32_t impact_detected_time = 0;
+uint32_t last_impact_detect_time = 0;
+bool is_playing_sound = false;
+float prev_accel_sq = 1.0f;  // 加速度の二乗値（最適化）
+
 void lipsync() {
+  
+  // 音声再生中はスキップ
+  if (is_playing_sound) {
+    return;
+  }
   
   size_t bytesread;
   uint64_t level = 0;
@@ -94,6 +108,7 @@ void setup()
 {
   auto cfg = M5.config();
   cfg.internal_mic = false;
+  cfg.external_speaker.atomic_echo = true;
   M5.begin(cfg);
 //  Serial.begin(115200);
 #if defined( ARDUINO_M5STACK_CORES3 )
@@ -114,9 +129,9 @@ void setup()
   switch (M5.getBoard()) {
     case m5::board_t::board_M5AtomS3:
     case m5::board_t::board_M5AtomS3R:
-      first_cps = 3;
-      scale = 0.55f;
-      position_top =  -60;
+      first_cps = 4;
+      scale = 0.47f;
+      position_top =  -45;
       position_left = -95;
       display_rotation = 0;
       // M5AtomS3は外部マイク(PDMUnit)なので設定を行う。
@@ -187,7 +202,7 @@ void setup()
       break;
 
       
-    defalut:
+    default:
       M5.Log.println("Invalid board.");
       break;
   }
@@ -195,9 +210,17 @@ void setup()
 #ifndef SDL_h_
   rec_data = (typeof(rec_data))heap_caps_malloc(WAVE_SIZE * sizeof(int16_t), MALLOC_CAP_8BIT);
   memset(rec_data, 0 , WAVE_SIZE * sizeof(int16_t));
-  M5.Mic.begin();
+  bool mic_result = M5.Mic.begin();
+  M5_LOGI("M5.Mic.begin() result: %d, isEnabled: %d", mic_result, M5.Mic.isEnabled());
 #endif
   M5.Speaker.end();
+
+  // IMUセンサーの初期化（衝撃検知用）
+  if (M5.Imu.isEnabled()) {
+    M5_LOGI("IMU initialized successfully");
+  } else {
+    M5_LOGE("IMU initialization failed");
+  }
 
   M5_LOGI("avatar setup");
   M5.Display.setRotation(display_rotation);
@@ -222,6 +245,10 @@ void setup()
   cps[5] = new ColorPalette();
   cps[5]->set(COLOR_PRIMARY, (uint16_t)0x303303);
   cps[5]->set(COLOR_BACKGROUND, (uint16_t)0x00ff00);
+  
+  // 感情用パレットの初期化
+  initializeEmotionPalettes(cps);
+  
   avatar.setColorPalette(*cps[first_cps]);
   //avatar.addTask(lipsync, "lipsync");
   last_rotation_msec = lgfx::v1::millis();
@@ -237,6 +264,13 @@ void loop()
 #if defined( ARDUINO_M5STACK_CORES3 )
   unifiedButton.update();
 #endif
+  
+  // 衝撃検知処理
+  handleImpactDetection(avatar, cps);
+  
+  // 表情の持続時間管理
+  handleExpressionDuration(avatar, cps);
+  
   if (M5.BtnA.wasPressed()) {
     M5_LOGI("Push BtnA");
     palette_index++;
