@@ -1,8 +1,8 @@
 [衝撃を検知して表情を変えるｱﾄﾑﾆｬﾝ（AtomNyan）です。](https://x.com/cubic9com/status/2017193857096761678)
 
-※. ｱﾄﾑﾆｬﾝとは、[aokko2000](https://x.com/aokko2000)さんが作成したAtomS3と組み合わせて作る可愛いマスコットです。
+※. [ｱﾄﾑﾆｬﾝ（AtomNyan）](https://x.com/search?q=%23%EF%BD%B1%EF%BE%84%EF%BE%91%EF%BE%86%EF%BD%AC%EF%BE%9D) とは、[aokko2000](https://x.com/aokko2000) さんが作成した [AtomS3](https://docs.m5stack.com/ja/core/AtomS3) と組み合わせて作る可愛いマスコットです。
 
-[Takao Akaki](https://github.com/mongonta0716) 様の [m5stack-avatar-mic](https://github.com/mongonta0716/m5stack-avatar-mic) をフォークして、衝撃検知処理を追加したものです。
+このプロジェクトは [Takao Akaki](https://github.com/mongonta0716) 様の [m5stack-avatar-mic](https://github.com/mongonta0716/m5stack-avatar-mic) をフォークして、衝撃検知による表情変更処理を追加したものです。
 
 差分の多くは `impact_handler.h` 、 `impact_handler.cpp` に集中させており、 `main.cpp` の修正箇所はわずかです。
 
@@ -29,7 +29,6 @@
     - クレジット:
         - [Additional sounds: Joseph SARDIN - BigSoundBank.com](https://bigsoundbank.com/licenses.html)
         - Licensed under [Creative Commons CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
-        - 
 - 怒り用音声
     - 元ファイル: [ANMLCat_Little meow of a cat 10 (ID 1480)_BigSoundBank.com.wav](https://bigsoundbank.com/little-meow-of-a-cat-10-s1480.html)
     - クレジット:
@@ -80,4 +79,4 @@
 
 [Takao Akaki](https://github.com/mongonta0716)
 
-衝撃検知部分： [きゅーこん](https://github.com/cubic9com)
+衝撃検知による表情変更部分： [きゅーこん](https://github.com/cubic9com)
